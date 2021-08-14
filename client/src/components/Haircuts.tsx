@@ -11,8 +11,10 @@ import {
   Icon,
   Input,
   Image,
-  Loader
+  Loader,
+  Form
 } from 'semantic-ui-react'
+import SemanticDatepicker from 'react-semantic-ui-datepickers';
 
 import { createHaircut, deleteHaircut, getHaircuts, patchHaircut } from '../api/haircuts-api'
 import Auth from '../auth/Auth'
@@ -26,6 +28,8 @@ interface HaircutProps {
 interface HaircutState {
   haircuts: Haircut[]
   newHaircutName: string
+  newHaircutDescription: string
+  newAppointmentDate: string
   loadingHaircuts: boolean
 }
 
@@ -33,11 +37,21 @@ export class Haircuts extends React.PureComponent<HaircutProps, HaircutState> {
   state: HaircutState = {
     haircuts: [],
     newHaircutName: '',
+    newHaircutDescription: '',
+    newAppointmentDate: '',
     loadingHaircuts: true
   }
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newHaircutName: event.target.value })
+  }
+
+  handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ newAppointmentDate: event.target.value })
+  }
+
+  handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ newHaircutDescription: event.target.value })
   }
 
   onEditButtonClick = (haircutId: string) => {
@@ -46,14 +60,17 @@ export class Haircuts extends React.PureComponent<HaircutProps, HaircutState> {
 
   onHaircutCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
     try {
-      const appointmentDate = this.calculateAppointmentDate()
+      // const appointmentDate = this.calculateAppointmentDate()
       const newHaircut = await createHaircut(this.props.auth.getIdToken(), {
         name: this.state.newHaircutName,
-        appointmentDate
+        description: this.state.newHaircutDescription,
+        appointmentDate: this.state.newAppointmentDate
       })
       this.setState({
         haircuts: [...this.state.haircuts, newHaircut],
-        newHaircutName: ''
+        newHaircutName: '',
+        newHaircutDescription: '',
+        newAppointmentDate: ''
       })
     } catch {
       alert('Faile to create haircut appointment')
@@ -65,24 +82,6 @@ export class Haircuts extends React.PureComponent<HaircutProps, HaircutState> {
       await deleteHaircut(this.props.auth.getIdToken(), haircutId)
       this.setState({
         haircuts: this.state.haircuts.filter(haircut => haircut.haircutId != haircutId)
-      })
-    } catch {
-      alert('Failed to delete haircut appointment')
-    }
-  }
-
-  onHaircutCheck = async (pos: number) => {
-    try {
-      const haircut = this.state.haircuts[pos]
-      await patchHaircut(this.props.auth.getIdToken(), haircut.haircutId, {
-        name: haircut.name,
-        appointmentDate: haircut.appointmentDate,
-        done: !haircut.done
-      })
-      this.setState({
-        haircuts: update(this.state.haircuts, {
-          [pos]: { done: { $set: !haircut.done } }
-        })
       })
     } catch {
       alert('Failed to delete haircut appointment')
@@ -118,17 +117,23 @@ export class Haircuts extends React.PureComponent<HaircutProps, HaircutState> {
       <Grid.Row>
         <Grid.Column width={16}>
           <Input
+            placeholder="Name"
+            onChange={this.handleNameChange}
+          />
+          <Input
+            placeholder="Date (2021-08-14)"
+            onChange={this.handleDateChange}
+          />
+          <Input
             action={{
               color: 'teal',
-              labelPosition: 'left',
+              labelPosition: 'right',
               icon: 'add',
-              content: 'New task',
+              content: 'Book Appointment',
               onClick: this.onHaircutCreate
             }}
-            fluid
-            actionPosition="left"
-            placeholder="To change the world..."
-            onChange={this.handleNameChange}
+            placeholder="Description (Buzz cut...)"
+            onChange={this.handleDescriptionChange}
           />
         </Grid.Column>
         <Grid.Column width={16}>
@@ -159,20 +164,37 @@ export class Haircuts extends React.PureComponent<HaircutProps, HaircutState> {
   renderHaircutsList() {
     return (
       <Grid padded>
+        <Grid.Row key="Main">
+              <Grid.Column width={3} verticalAlign="middle">
+                Name
+              </Grid.Column>
+              <Grid.Column width={3} verticalAlign="middle">
+                Date
+              </Grid.Column>
+              <Grid.Column width={8} floated="right">
+                Description
+              </Grid.Column>
+              <Grid.Column width={1} floated="right">
+
+              </Grid.Column>
+              <Grid.Column width={1} floated="right">
+
+              </Grid.Column>
+              <Grid.Column width={16}>
+                <Divider />
+              </Grid.Column>
+            </Grid.Row>
         {this.state.haircuts.map((haircut, pos) => {
           return (
             <Grid.Row key={haircut.haircutId}>
-              <Grid.Column width={1} verticalAlign="middle">
-                <Checkbox
-                  onChange={() => this.onHaircutCheck(pos)}
-                  checked={haircut.done}
-                />
-              </Grid.Column>
-              <Grid.Column width={10} verticalAlign="middle">
-                {haircut.name}
+              <Grid.Column width={3} verticalAlign="middle">
+                {haircut.description}
               </Grid.Column>
               <Grid.Column width={3} floated="right">
                 {haircut.appointmentDate}
+              </Grid.Column>
+              <Grid.Column width={8} verticalAlign="middle">
+                {haircut.name}
               </Grid.Column>
               <Grid.Column width={1} floated="right">
                 <Button

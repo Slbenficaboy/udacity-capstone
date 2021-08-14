@@ -3,6 +3,6 @@ export interface Haircut {
   createdAt: string
   name: string
   appointmentDate: string
-  done: boolean
+  description: string
   attachmentUrl?: string
 }

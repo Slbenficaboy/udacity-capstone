@@ -8,16 +8,13 @@
         "minLength": 1
       }, 
       "appointmentDate": {
-          "type": "string"
-      }, 
-      "done": {
-          "type": "boolean"
+          "type": "string",
+          "minLength": 1
       }
     },
     "required": [
       "name", 
-      "appointmentDate",
-      "done"
+      "appointmentDate"
     ],
     "additionalProperties": false
 }

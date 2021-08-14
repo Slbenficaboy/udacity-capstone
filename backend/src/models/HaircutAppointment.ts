@@ -4,6 +4,6 @@ export interface HaircutAppointment {
   createdAt: string
   name: string
   appointmentDate: string
-  done: boolean
+  description: string
   attachmentUrl?: string
 }

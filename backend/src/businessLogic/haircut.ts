@@ -16,7 +16,6 @@ export class HaircutBL {
             userId: userId,
             haircutId: haircutId,
             createdAt: new Date().toISOString(),
-            done: false,
             ...newHaircutData
         }
         await haircutAccess.saveHaircut(newHaircutAppointment)
