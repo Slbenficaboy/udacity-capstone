@@ -1,5 +1,5 @@
 // DONE: Once your application is deployed, copy an API id here so that the frontend could interact with it
-const apiId = 'id9t8npefg'
+const apiId = 'o8b1luhiyf'
 export const apiEndpoint = `https://${apiId}.execute-api.us-east-1.amazonaws.com/dev`
 
 export const authConfig = {
