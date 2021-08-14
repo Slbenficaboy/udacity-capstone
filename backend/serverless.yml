@@ -1,5 +1,5 @@
 service:
-  name: serverless-todo-app
+  name: sls-haircuts-app
 
 plugins:
   - serverless-webpack
@@ -15,107 +15,102 @@ provider:
   region: ${opt:region, 'us-east-1'}
 
   environment:
-    TODOS_TABLE: ToDos-${self:provider.stage}
-    TODO_INDEX: ToDoIndex
-    TODO_S3_BUCKET: serverless-todo-images-626970730723-${self:provider.stage}
+    HAIRCUT_TABLE: Haircuts-${self:provider.stage}
+    HAIRCUT_INDEX: HaircutIndex
+    HAIRCUT_S3_BUCKET: serverless-haircuts-images-626970730723-${self:provider.stage}
 
 custom: 
   documentation: 
     api: 
       info: 
         version: v1.0.0
-        title: ToDo API
-        description: Serverless project for todo list
+        title: Haircut API
+        description: Serverless project for haircut appointments
 
     models: 
-      - name: CreateToDoRequest
+      - name: CreateHaircutAppointment
         contentType: application/json
-        schema: ${file(models/create-todo-request.json)}
-      - name: UpdateToDoRequest
+        schema: ${file(models/create-haircut-appointment.json)}
+      - name: UpdateHaircutAppointment
         contentType: application/json
-        schema: ${file(models/update-todo-request.json)}
+        schema: ${file(models/update-haircut-appointment.json)}
 
 functions:
 
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
 
-  # DONE: Configure this function
-  GetTodos:
-    handler: src/lambda/http/getTodos.handler
+  GetHaircuts:
+    handler: src/lambda/http/getHaircuts.handler
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HAIRCUT_TABLE}
       - Effect: Allow
         Action:
           - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODO_INDEX}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HAIRCUT_TABLE}/index/${self:provider.environment.HAIRCUT_INDEX}
     events:
       - http:
           method: get
-          path: todos
+          path: haircuts
           cors: true
 
-  # DONE: Configure this function
-  CreateTodo:
-    handler: src/lambda/http/createTodo.handler
+  CreateHaircuts:
+    handler: src/lambda/http/createHaircut.handler
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:PutItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HAIRCUT_TABLE}
     events:
       - http:
           method: post
-          path: todos
+          path: haircuts
           cors: true
           reqValidatorName: RequestBodyValidator
           documentation:
-            summary: Create todo
-            description: Create todo
+            summary: Create haircut appoinment
+            description: Create haircut appointment
             requestModels:
-              'application/json': CreateToDoRequest
+              'application/json': CreateHaircutAppointment
 
-  # DONE: Configure this function
-  UpdateTodo:
-    handler: src/lambda/http/updateTodo.handler
+  UpdateHaircut:
+    handler: src/lambda/http/updateHaircut.handler
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:UpdateItem
           - dynamodb:GetItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HAIRCUT_TABLE}
     events:
       - http:
           method: patch
-          path: todos/{todoId}
+          path: haircuts/{haircutId}
           cors: true
           reqValidatorName: RequestBodyValidator
           documentation:
-            summary: Update todo
-            description: Update todo
+            summary: Update haircut appointments
+            description: Update haircute appointments
             requestModels:
-              'application/json': UpdateToDoRequest
+              'application/json': UpdateHaircutAppointment
 
-  # DONE: Configure this function
-  DeleteTodo:
-    handler: src/lambda/http/deleteTodo.handler
+  DeleteHaircut:
+    handler: src/lambda/http/deleteHaircut.handler
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:GetItem
           - dynamodb:DeleteItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HAIRCUT_TABLE}
     events:
       - http:
           method: delete
-          path: todos/{todoId}
+          path: haircuts/{haircutId}
           cors: true
 
 
-  # DONE: Configure this function
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     iamRoleStatements:
@@ -123,39 +118,38 @@ functions:
         Action:
           - dynamodb:UpdateItem
           - dynamodb:GetItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.HAIRCUT_TABLE}
       - Effect: Allow
         Action:
           - s3:PutObject
-        Resource: arn:aws:s3:::${self:provider.environment.TODO_S3_BUCKET}/*
+        Resource: arn:aws:s3:::${self:provider.environment.HAIRCUT_S3_BUCKET}/*
     events:
       - http:
           method: post
-          path: todos/{todoId}/attachment
+          path: haircuts/{haircutId}/attachment
           cors: true
 
 resources:
   Resources:
-    # DONE: Add any necessary AWS resources
-    ToDosTable:
+    HarcutTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
           - AttributeName: userId
             AttributeType: S
-          - AttributeName: todoId
+          - AttributeName: haircutId
             AttributeType: S
           - AttributeName: createdAt
             AttributeType: S
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
-          - AttributeName: todoId
+          - AttributeName: haircutId
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:provider.environment.TODOS_TABLE}
+        TableName: ${self:provider.environment.HAIRCUT_TABLE}
         LocalSecondaryIndexes:
-          - IndexName: ${self:provider.environment.TODO_INDEX}
+          - IndexName: ${self:provider.environment.HAIRCUT_INDEX}
             KeySchema:
               - AttributeName: userId
                 KeyType: HASH
@@ -164,10 +158,10 @@ resources:
             Projection:
               ProjectionType: ALL
 
-    TodoImagesBucket:
+    HaircutImagesBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.TODO_S3_BUCKET}
+        BucketName: ${self:provider.environment.HAIRCUT_S3_BUCKET}
         CorsConfiguration:
           CorsRules:
             -
@@ -203,5 +197,5 @@ resources:
               Effect: Allow
               Principal: '*'
               Action: 's3:GetObject'
-              Resource: 'arn:aws:s3:::${self:provider.environment.TODO_S3_BUCKET}/*'
-        Bucket: !Ref TodoImagesBucket
+              Resource: 'arn:aws:s3:::${self:provider.environment.HAIRCUT_S3_BUCKET}/*'
+        Bucket: !Ref HaircutImagesBucket

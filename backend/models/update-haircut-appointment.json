@@ -1,23 +1,20 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "update-todos",
+    "title": "update-haircut",
     "type": "object",
     "properties": {
       "name": {
         "type": "string",
         "minLength": 1
       }, 
-      "dueDate": {
-          "type": "string"
-      }, 
-      "done": {
-          "type": "boolean"
+      "appointmentDate": {
+          "type": "string",
+          "minLength": 1
       }
     },
     "required": [
       "name", 
-      "dueDate",
-      "done"
+      "appointmentDate"
     ],
     "additionalProperties": false
 }

@@ -1,19 +1,25 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "create-todos",
+    "title": "create-haircuts",
     "type": "object",
     "properties": {
       "name": {
         "type": "string",
         "minLength": 1
-      }, 
-      "dueDate": {
-          "type": "string"
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1
+    }, 
+      "appointmentDate": {
+          "type": "string",
+          "minLength": 1
       }
     },
     "required": [
       "name", 
-      "dueDate"
+      "description",
+      "appointmentDate"
     ],
     "additionalProperties": false
 }
