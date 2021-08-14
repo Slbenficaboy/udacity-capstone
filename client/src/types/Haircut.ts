@@ -1,8 +1,8 @@
-export interface Todo {
-  todoId: string
+export interface Haircut {
+  haircutId: string
   createdAt: string
   name: string
-  dueDate: string
+  appointmentDate: string
   done: boolean
   attachmentUrl?: string
 }
