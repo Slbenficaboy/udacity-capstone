@@ -1,5 +1,5 @@
-export interface UpdateTodoRequest {
+export interface UpdateHaircutAppointment {
   name: string
-  dueDate: string
+  appointmentDate: string
   done: boolean
 }
