@@ -2,26 +2,24 @@ import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 
-import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
+import { UpdateHaircutAppointment } from '../../requests/UpdateHaircutAppointment'
 
-import {TodoBL} from "../../businessLogic/todo";
+import {HaircutBL} from "../../businessLogic/haircut";
 import {getUserId} from "../utils";
 
-const todoBL = new TodoBL()
+const haircutBL = new HaircutBL()
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const todoId = event.pathParameters.todoId
-    const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
-
-    // DONE: Update a TODO item with the provided id using values in the "updatedTodo" object
+    const haircutId = event.pathParameters.haircutId
+    const updatedHaircut: UpdateHaircutAppointment = JSON.parse(event.body)
     let statuscode = 200
     let headers = {
         'Access-Control-Allow-Origin': '*'
     }
     const userId = getUserId(event);
 
-    const todo = await todoBL.update(todoId, updatedTodo, userId);
-    if (!todo) {
+    const haircut = await haircutBL.update(haircutId, updatedHaircut, userId);
+    if (!haircut) {
         statuscode = 404
     }
 

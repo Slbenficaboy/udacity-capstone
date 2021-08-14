@@ -2,16 +2,15 @@ import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 
-import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
+import { CreateHaircutAppointment } from '../../requests/CreateHaircutAppointment'
 
-import {TodoBL} from "../../businessLogic/todo";
+import {HaircutBL} from "../../businessLogic/haircut";
 import {getUserId} from "../utils";
 
-const todoBL = new TodoBL()
+const haircutBL = new HaircutBL()
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const newTodo: CreateTodoRequest = JSON.parse(event.body)
-    // DONE: Implement creating a new TODO item
+    const newHaircutAppointment: CreateHaircutAppointment = JSON.parse(event.body)
     const userId: string = getUserId(event)
     let statusCode = 201
     let headers = {
@@ -21,6 +20,6 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     return {
         statusCode: statusCode,
         headers: headers,
-        body: JSON.stringify({item: await todoBL.createNew(newTodo, userId)})
+        body: JSON.stringify({item: await haircutBL.createNew(newHaircutAppointment, userId)})
     }
 }

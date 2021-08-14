@@ -1,42 +1,42 @@
 import {DocumentClient} from "aws-sdk/clients/dynamodb";
 import * as AWS from "aws-sdk";
-import {TodoItem} from "../models/TodoItem";
-import {UpdateTodoRequest} from "../requests/UpdateTodoRequest";
+import {HaircutAppointment} from "../models/HaircutAppointment";
+import {UpdateHaircutAppointment} from "../requests/UpdateHaircutAppointment";
 import {S3} from "aws-sdk/clients/browser_default";
 
 const AWSXRay = require('aws-xray-sdk')
 const XAWS = AWSXRay.captureAWS(AWS)
 
-export class TodoAccess {
+export class HaircutAccess {
     constructor(
         private readonly dynamodb: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
         private readonly s3: S3 = new XAWS.S3({signatureVersion: 'v4'}),
 
-        private readonly todoTable: string = process.env.TODOS_TABLE,
-        private readonly index: string = process.env.TODO_INDEX,
-        private readonly todoS3Bucket: string = process.env.TODO_S3_BUCKET
+        private readonly haircutTable: string = process.env.HAIRCUT_TABLE,
+        private readonly index: string = process.env.HAIRCUT_INDEX,
+        private readonly haircutS3Bucket: string = process.env.HAIRCUT_S3_BUCKET
     ) {
     }
 
-    async saveTodo(todo: TodoItem) {
+    async saveHaircut(haircut: HaircutAppointment) {
         await this.dynamodb.put({
-            TableName: this.todoTable,
-            Item: todo
+            TableName: this.haircutTable,
+            Item: haircut
         }).promise()
     }
 
-    async updateTodo(todoId: string, userId: string, updateTodoData: UpdateTodoRequest) {
+    async updateHaircut(haircutId: string, userId: string, updateHaircutAppointment: UpdateHaircutAppointment) {
         await this.dynamodb.update({
-            TableName: this.todoTable,
+            TableName: this.haircutTable,
             Key: {
                 userId: userId,
-                todoId: todoId
+                haircutId: haircutId
             },
             UpdateExpression: 'set #name = :name, #dueDate = :duedate, #done = :done',
             ExpressionAttributeValues: {
-                ':name': updateTodoData.name,
-                ':duedate': updateTodoData.dueDate,
-                ':done': updateTodoData.done
+                ':name': updateHaircutAppointment.name,
+                ':duedate': updateHaircutAppointment.dueDate,
+                ':done': updateHaircutAppointment.done
             },
             ExpressionAttributeNames: {
                 '#name': 'name',
@@ -46,22 +46,22 @@ export class TodoAccess {
         }).promise()
     }
 
-    async deleteTodo(todoId: string, userId: string) {
+    async deleteHaircut(haircutId: string, userId: string) {
         await this.dynamodb.delete({
-            TableName: this.todoTable,
+            TableName: this.haircutTable,
             Key: {
                 userId: userId,
-                todoId: todoId
+                haircutId: haircutId
             }
         }).promise()
     }
 
-    async findTodo(todoId: string, userId: string): Promise<TodoItem> | undefined {
+    async findHaircut(haircutId: string, userId: string): Promise<HaircutAppointment> | undefined {
         const result = await this.dynamodb.get({
-            TableName: this.todoTable,
+            TableName: this.haircutTable,
             Key: {
                 userId: userId,
-                todoId: todoId
+                haircutId: haircutId
             }
         }).promise()
 
@@ -69,12 +69,12 @@ export class TodoAccess {
             return undefined
         }
 
-        return result.Item as TodoItem
+        return result.Item as HaircutAppointment
     }
 
-    async getTodos(userId: string) {
+    async getHaircuts(userId: string) {
         const result = await this.dynamodb.query({
-            TableName: this.todoTable,
+            TableName: this.haircutTable,
             IndexName: this.index,
             KeyConditionExpression: 'userId = :userId',
             ExpressionAttributeValues: {
@@ -85,24 +85,24 @@ export class TodoAccess {
         return result.Items
     }
 
-    async attachToTodo(todoId: string, userId: string) {
+    async attachToHaircut(haircutId: string, userId: string) {
         await this.dynamodb.update({
-            TableName: this.todoTable,
+            TableName: this.haircutTable,
             Key: {
                 userId: userId,
-                todoId: todoId
+                haircutId: haircutId
             },
             UpdateExpression: 'set attachmentUrl = :url',
             ExpressionAttributeValues: {
-                ':url': `https://${process.env.TODO_S3_BUCKET}.s3.amazonaws.com/${todoId}`
+                ':url': `https://${process.env.HAIRCUT_S3_BUCKET}.s3.amazonaws.com/${haircutId}`
             }
         }).promise()
     }
 
-    getTodoUploadURL(todoId: string) {
+    getHaircutUploadURL(haircutId: string) {
         return this.s3.getSignedUrl('putObject', {
-            Bucket: this.todoS3Bucket,
-            Key: todoId,
+            Bucket: this.haircutS3Bucket,
+            Key: haircutId,
             Expires: 500
         })
     }

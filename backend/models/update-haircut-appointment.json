@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "update-todos",
+    "title": "update-haircut",
     "type": "object",
     "properties": {
       "name": {
@@ -16,7 +16,7 @@
     },
     "required": [
       "name", 
-      "dueDate",
+      "appointmentDate",
       "done"
     ],
     "additionalProperties": false
