@@ -1,5 +1,5 @@
 service:
-  name: serverless-haircuts-app
+  name: sls-haircuts-app
 
 plugins:
   - serverless-webpack
