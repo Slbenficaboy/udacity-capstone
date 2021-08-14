@@ -32,15 +32,15 @@ export class HaircutAccess {
                 userId: userId,
                 haircutId: haircutId
             },
-            UpdateExpression: 'set #name = :name, #dueDate = :duedate, #done = :done',
+            UpdateExpression: 'set #name = :name, #appointmentDate = :appointmentDate, #done = :done',
             ExpressionAttributeValues: {
                 ':name': updateHaircutAppointment.name,
-                ':duedate': updateHaircutAppointment.dueDate,
+                ':appointmentDate': updateHaircutAppointment.appointmentDate,
                 ':done': updateHaircutAppointment.done
             },
             ExpressionAttributeNames: {
                 '#name': 'name',
-                '#dueDate': 'dueDate',
+                '#appointmentDate': 'appointmentDate',
                 '#done': 'done'
             }
         }).promise()
